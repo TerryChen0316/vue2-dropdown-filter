@@ -1,4 +1,4 @@
-# vue2-dropdown-filter
+# @terry0316/vue2-dropdown-filter
 
 🔽 A reusable Vue 2 + Element-UI dropdown filter component with remote search, direct options, i18n, and eventBus (PubSub.js) support.
 
@@ -12,7 +12,7 @@
 ## 📦 Installation
 
 ```bash
-npm install vue2-dropdown-filter pubsub-js
+npm install @terry0316/vue2-dropdown-filter pubsub-js
 ```
 
 ## 🛠 Usage
@@ -21,7 +21,7 @@ npm install vue2-dropdown-filter pubsub-js
 import Vue from 'vue'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import DropdownFilter from 'vue2-dropdown-filter'
+import DropdownFilter from '@terry0316/vue2-dropdown-filter'
 
 Vue.use(ElementUI)
 Vue.component('DropdownFilter', DropdownFilter)
