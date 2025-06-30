@@ -13,20 +13,15 @@ export const LOCALES = {
     actions: 'Actions',
     edit: 'Edit',
     
-    // Languages
-    english: 'English',
-    traditionalChinese: '繁體中文',
-    simplifiedChinese: '简体中文',
-    japanese: '日本語',
-    
     // DropdownFilter
-    search: 'Search...',
-    optionsCount: '{count} options',
-    selectAll: 'Select All',
-    clear: 'Clear',
-    noOptions: 'No options found',
     apply: 'Apply',
+    cancel: 'Cancel',
+    clear: 'Clear',
     loadingError: 'Failed to load {label} options',
+    noOptions: 'No options found',
+    optionsCount: '{count} options',
+    search: 'Search...',
+    selectAll: 'Select All',
   },
   'zh-TW': {
     // Table columns
@@ -39,20 +34,15 @@ export const LOCALES = {
     actions: '操作',
     edit: '編輯',
     
-    // Languages
-    english: 'English',
-    traditionalChinese: '繁體中文',
-    simplifiedChinese: '简体中文',
-    japanese: '日本語',
-    
     // DropdownFilter
-    search: '搜尋...',
-    optionsCount: '{count} 個選項',
-    selectAll: '全選',
-    clear: '清除',
-    noOptions: '找不到選項',
     apply: '套用',
+    cancel: '取消',
+    clear: '清除',
     loadingError: '載入 {label} 選項失敗',
+    noOptions: '找不到選項',
+    optionsCount: '{count} 個選項',
+    search: '搜尋...',
+    selectAll: '全選',
   },
   'zh-CN': {
     // Table columns
@@ -65,26 +55,15 @@ export const LOCALES = {
     actions: '操作',
     edit: '编辑',
     
-    // Languages
-    english: 'English',
-    traditionalChinese: '繁體中文',
-    simplifiedChinese: '简体中文',
-    japanese: '日本語',
-    
     // DropdownFilter
-    search: '搜索...',
-    optionsCount: '{count} 个选项',
-    selectAll: '全选',
-    clear: '清除',
-    noOptions: '未找到选项',
     apply: '应用',
+    cancel: '取消',
+    clear: '清除',
     loadingError: '加载 {label} 选项失败',
-    
-    // FloatingFilterPanel
-    filters: '筛选器',
-    filterPanel: '筛选面板',
-    activeFilters: '活动筛选器',
-    searchPlaceholder: '搜索 {label}...'
+    noOptions: '未找到选项',
+    optionsCount: '{count} 个选项',
+    search: '搜索...',
+    selectAll: '全选',
   },
   ja: {
     // Table columns
@@ -97,26 +76,15 @@ export const LOCALES = {
     actions: 'アクション',
     edit: '編集',
     
-    // Languages
-    english: 'English',
-    traditionalChinese: '繁體中文',
-    simplifiedChinese: '简体中文',
-    japanese: '日本語',
-    
     // DropdownFilter
-    search: '検索...',
-    optionsCount: '{count} 個のオプション',
-    selectAll: 'すべて選択',
-    clear: 'クリア',
-    noOptions: 'オプションが見つかりません',
     apply: '適用',
+    cancel: 'キャンセル',
+    clear: 'クリア',
     loadingError: '{label} オプションの読み込みに失敗しました',
-    
-    // FloatingFilterPanel
-    filters: 'フィルター',
-    filterPanel: 'フィルターパネル',
-    activeFilters: 'アクティブフィルター',
-    searchPlaceholder: '{label} を検索...'
+    noOptions: 'オプションが見つかりません',
+    optionsCount: '{count} 個のオプション',
+    search: '検索...',
+    selectAll: 'すべて選択',
   }
 }
 

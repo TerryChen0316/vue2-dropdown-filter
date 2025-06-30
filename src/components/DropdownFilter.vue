@@ -1,15 +1,12 @@
 <template>
   <div 
-    class="dropdown-filter-wrapper"
-    :class="[{ 'active': isFiltered }, customClass, customClasses.wrapper]"
-    :style="customStyles.wrapper"
+    class="filter-dropdown-wrapper"
+    :class="{ 'active': isFiltered }"
   >
     <!-- Filter Count Badge -->
     <span 
       v-if="showFilterCount && filterCount > 0" 
       class="filter-count-badge"
-      :class="customClasses.filterCountBadge"
-      :style="customStyles.filterCountBadge"
     >
       {{ filterCount }}
     </span>
@@ -21,25 +18,15 @@
       :hide-on-click="false"
       @visible-change="handleVisibleChange"
     >
-      <span 
-        class="filter-trigger"
-        :class="customClasses.filterTrigger"
-        :style="customStyles.filterTrigger"
-      >
+      <span class="filter-trigger">
         <i class="el-icon-arrow-down"></i>
       </span>
-      <el-dropdown-menu slot="dropdown" class="dropdown-filter-menu">
-        <div 
-          class="filter-content"
-          :class="customClasses.filterContent"
-          :style="customStyles.filterContent"
-        >
+      <el-dropdown-menu slot="dropdown" class="filter-dropdown-menu">
+        <div class="filter-content">
           <!-- Search Input - Only show when directOptions is empty -->
           <div 
             v-if="shouldShowSearch" 
             class="filter-search"
-            :class="customClasses.filterSearch"
-            :style="customStyles.filterSearch"
           >
             <el-input
               v-model="searchKeyword"
@@ -52,23 +39,11 @@
           </div>
           
           <!-- Filter Options Header -->
-          <div 
-            class="filter-options-header"
-            :class="customClasses.filterOptionsHeader"
-            :style="customStyles.filterOptionsHeader"
-          >
-            <span 
-              class="options-count"
-              :class="customClasses.optionsCount"
-              :style="customStyles.optionsCount"
-            >
+          <div class="filter-options-header">
+            <span class="options-count">
               {{ i18n.t('optionsCount', { count: filterOptions.length }) }}
             </span>
-            <div 
-              class="options-actions"
-              :class="customClasses.optionsActions"
-              :style="customStyles.optionsActions"
-            >
+            <div class="options-actions">
               <el-button type="text" size="mini" @click="selectAllOptions">
                 {{ i18n.t('selectAll') }}
               </el-button>
@@ -82,8 +57,6 @@
           <div 
             class="filter-options" 
             v-loading="loading"
-            :class="customClasses.filterOptions"
-            :style="customStyles.filterOptions"
           >
             <el-checkbox-group 
               v-model="selectedValues"
@@ -93,8 +66,6 @@
                 v-for="option in filterOptions"
                 :key="option"
                 class="filter-option"
-                :class="customClasses.filterOption"
-                :style="customStyles.filterOption"
               >
                 <el-checkbox :label="option">{{ option }}</el-checkbox>
               </div>
@@ -103,19 +74,13 @@
             <div 
               v-if="filterOptions.length === 0 && !loading" 
               class="no-options"
-              :class="customClasses.noOptions"
-              :style="customStyles.noOptions"
             >
               {{ i18n.t('noOptions') }}
             </div>
           </div>
           
           <!-- Filter Control Buttons -->
-          <div 
-            class="filter-controls"
-            :class="customClasses.filterControls"
-            :style="customStyles.filterControls"
-          >
+          <div class="filter-controls">
             <el-button 
               size="mini" 
               @click="handleCancel"
@@ -176,45 +141,6 @@ export default {
     customMessages: {
       type: Object,
       default: () => ({})
-    },
-    // Customization props
-    customClass: {
-      type: String,
-      default: ''
-    },
-    customClasses: {
-      type: Object,
-      default: () => ({
-        wrapper: '',
-        filterCountBadge: '',
-        filterTrigger: '',
-        filterContent: '',
-        filterSearch: '',
-        filterOptionsHeader: '',
-        optionsCount: '',
-        optionsActions: '',
-        filterOptions: '',
-        filterOption: '',
-        noOptions: '',
-        filterControls: ''
-      })
-    },
-    customStyles: {
-      type: Object,
-      default: () => ({
-        wrapper: {},
-        filterCountBadge: {},
-        filterTrigger: {},
-        filterContent: {},
-        filterSearch: {},
-        filterOptionsHeader: {},
-        optionsCount: {},
-        optionsActions: {},
-        filterOptions: {},
-        filterOption: {},
-        noOptions: {},
-        filterControls: {}
-      })
     }
   },
   
@@ -501,12 +427,12 @@ export default {
 </script>
 
 <style scoped>
-.dropdown-filter-wrapper {
+.filter-dropdown-wrapper {
   cursor: pointer;
   position: relative;
 }
 
-.dropdown-filter-wrapper.active .filter-trigger {
+.filter-dropdown-wrapper.active .filter-trigger {
   color: #409eff;
 }
 
@@ -540,7 +466,7 @@ export default {
   color: #409eff;
 }
 
-.dropdown-filter-menu {
+.filter-dropdown-menu {
   min-width: 220px;
 }
 
