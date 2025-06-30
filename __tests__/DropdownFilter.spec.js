@@ -1,9 +1,9 @@
 import { shallowMount } from '@vue/test-utils'
-import ActiveFilters from '../src/ActiveFilters.vue'
+import DropdownFilter from '../src/DropdownFilter.vue'
 
-describe('ActiveFilters', () => {
+describe('DropdownFilter', () => {
   it('renders label', () => {
-    const wrapper = shallowMount(ActiveFilters, {
+    const wrapper = shallowMount(DropdownFilter, {
       propsData: {
         key: 'test',
         label: 'Test Filter',
