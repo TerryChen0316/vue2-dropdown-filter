@@ -1,6 +1,6 @@
 # @terry0316/vue2-dropdown-filter
 
-🔽 A reusable Vue 2 + Element-UI dropdown filter component with remote search, direct options, i18n, and eventBus (PubSub.js) support.
+🔽 Test only. A reusable Vue 2 + Element-UI dropdown filter component with remote search, direct options, i18n, and eventBus (PubSub.js) support.
 
 ## ✅ Features
 
