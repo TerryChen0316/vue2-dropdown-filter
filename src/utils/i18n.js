@@ -3,17 +3,6 @@ export const DEFAULT_LOCALE = 'en'
 
 export const LOCALES = {
   en: {
-    // Table columns
-    id: 'ID',
-    name: 'Name',
-    email: 'Email',
-    department: 'Department',
-    role: 'Role',
-    status: 'Status',
-    actions: 'Actions',
-    edit: 'Edit',
-    
-    // DropdownFilter
     apply: 'Apply',
     cancel: 'Cancel',
     clear: 'Clear',
@@ -24,17 +13,6 @@ export const LOCALES = {
     selectAll: 'Select All',
   },
   'zh-TW': {
-    // Table columns
-    id: 'ID',
-    name: '姓名',
-    email: '電子郵件',
-    department: '部門',
-    role: '職位',
-    status: '狀態',
-    actions: '操作',
-    edit: '編輯',
-    
-    // DropdownFilter
     apply: '套用',
     cancel: '取消',
     clear: '清除',
@@ -45,17 +23,6 @@ export const LOCALES = {
     selectAll: '全選',
   },
   'zh-CN': {
-    // Table columns
-    id: 'ID',
-    name: '姓名',
-    email: '邮箱',
-    department: '部门',
-    role: '职位',
-    status: '状态',
-    actions: '操作',
-    edit: '编辑',
-    
-    // DropdownFilter
     apply: '应用',
     cancel: '取消',
     clear: '清除',
@@ -66,17 +33,6 @@ export const LOCALES = {
     selectAll: '全选',
   },
   ja: {
-    // Table columns
-    id: 'ID',
-    name: '名前',
-    email: 'メール',
-    department: '部署',
-    role: '役職',
-    status: 'ステータス',
-    actions: 'アクション',
-    edit: '編集',
-    
-    // DropdownFilter
     apply: '適用',
     cancel: 'キャンセル',
     clear: 'クリア',
