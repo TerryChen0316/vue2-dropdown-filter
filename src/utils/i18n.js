@@ -3,44 +3,20 @@ export const DEFAULT_LOCALE = 'en'
 
 export const LOCALES = {
   en: {
-    apply: 'Apply',
-    cancel: 'Cancel',
-    clear: 'Clear',
-    loadingError: 'Failed to load {label} options',
-    noOptions: 'No options found',
-    optionsCount: '{count} options',
-    search: 'Search...',
-    selectAll: 'Select All',
+    filterCount: '{count} filters applied',
+    clearAll: 'Clear All',
   },
   'zh-TW': {
-    apply: '套用',
-    cancel: '取消',
-    clear: '清除',
-    loadingError: '載入 {label} 選項失敗',
-    noOptions: '找不到選項',
-    optionsCount: '{count} 個選項',
-    search: '搜尋...',
-    selectAll: '全選',
+    filterCount: '{count} 個篩選條件',
+    clearAll: '清除全部',
   },
   'zh-CN': {
-    apply: '应用',
-    cancel: '取消',
-    clear: '清除',
-    loadingError: '加载 {label} 选项失败',
-    noOptions: '未找到选项',
-    optionsCount: '{count} 个选项',
-    search: '搜索...',
-    selectAll: '全选',
+    filterCount: '{count} 个筛选条件',
+    clearAll: '清除全部',
   },
   ja: {
-    apply: '適用',
-    cancel: 'キャンセル',
-    clear: 'クリア',
-    loadingError: '{label} オプションの読み込みに失敗しました',
-    noOptions: 'オプションが見つかりません',
-    optionsCount: '{count} 個のオプション',
-    search: '検索...',
-    selectAll: 'すべて選択',
+    filterCount: '{count} 個のフィルター',
+    clearAll: 'すべてクリア',
   }
 }
 

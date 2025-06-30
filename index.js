@@ -1,7 +1,7 @@
-import DropdownFilter from './src/components/DropdownFilter.vue'
+import ActiveFilters from './src/components/ActiveFilters.vue'
 
-DropdownFilter.install = function (Vue) {
-  Vue.component(DropdownFilter.name, DropdownFilter)
+ActiveFilters.install = function (Vue) {
+  Vue.component(ActiveFilters.name, ActiveFilters)
 }
 
-export default DropdownFilter
+export default ActiveFilters
