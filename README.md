@@ -1,4 +1,4 @@
-# @terry0316/vue2-dropdown-filter
+# @terry0316/vue2-active-filters
 
 `Test only`. A customizable Vue 2 dropdown filter component designed for data tables or similar interfaces, supporting both direct options and remote search capabilities. It includes internationalization (i18n) and uses an event bus for inter-component communication.
 
@@ -16,9 +16,9 @@
 ## Installation
 
 ```bash
-npm install @terry0316/vue2-dropdown-filter
+npm install @terry0316/vue2-active-filters
 # OR
-yarn add @terry0316/vue2-dropdown-filter
+yarn add @terry0316/vue2-active-filters
 ````
 
 ## Usage
@@ -28,9 +28,9 @@ yarn add @terry0316/vue2-dropdown-filter
 ```vue
 // main.js or a component where you want to use it
 import Vue from 'vue'
-import DropdownFilter from '@terry0316/vue2-dropdown-filter'
+import ActiveFilters from '@terry0316/vue2-active-filters'
 
-Vue.component('DropdownFilter', DropdownFilter)
+Vue.component('ActiveFilters', ActiveFilters)
 ```
 
 ### Basic Usage
@@ -39,7 +39,7 @@ You can use the component with direct options:
 
 ```vue
 <template>
-  <dropdown-filter
+  <active-filters
     column-prop="status"
     column-label="Status"
     :direct-options="['Active', 'Inactive', 'Pending']"
@@ -49,11 +49,11 @@ You can use the component with direct options:
 </template>
 
 <script>
-import DropdownFilter from '@terry0316/vue2-dropdown-filter';
+import ActiveFilters from '@terry0316/vue2-active-filters';
 
 export default {
   components: {
-    DropdownFilter
+    ActiveFilters
   },
   data() {
     return {
@@ -77,7 +77,7 @@ For scenarios where options need to be fetched from an API:
 
 ```vue
 <template>
-  <dropdown-filter
+  <active-filters
     column-prop="userName"
     column-label="User Name"
     :remote-search-fn="searchUsers"
@@ -87,11 +87,11 @@ For scenarios where options need to be fetched from an API:
 </template>
 
 <script>
-import DropdownFilter from '@terry0316/vue2-dropdown-filter';
+import ActiveFilters from '@terry0316/vue2-active-filters';
 
 export default {
   components: {
-    DropdownFilter
+    ActiveFilters
   },
   data() {
     return {
@@ -127,7 +127,7 @@ The component uses a simple i18n utility. You can specify the `locale` and provi
 
 ```vue
 <template>
-  <dropdown-filter
+  <active-filters
     column-prop="category"
     column-label="Category"
     :direct-options="['Electronics', 'Books', 'Clothing']"
@@ -137,11 +137,11 @@ The component uses a simple i18n utility. You can specify the `locale` and provi
 </template>
 
 <script>
-import DropdownFilter from '@terry0316/vue2-dropdown-filter';
+import ActiveFilters from '@terry0316/vue2-active-filters';
 
 export default {
   components: {
-    DropdownFilter
+    ActiveFilters
   },
   data() {
     return {
@@ -195,8 +195,8 @@ The component publishes and subscribes to various events on the `EventBus` (from
 | :------------------ | :-------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `EVENTS.DROPDOWN_OPENED` | `{ columnProp: string, columnLabel: string }`                 | Published when the filter dropdown is opened.                                                                                                                                                                                                   |
 | `EVENTS.DROPDOWN_CLOSED` | `{ columnProp: string, columnLabel: string }`                 | Published when the filter dropdown is closed.                                                                                                                                                                                                   |
-| `EVENTS.FILTER_CHANGED`  | `{ columnProp: string, selectedValues: Array, source: string }` OR `{ columnProp: string, searchKeyword: string, source: string }` | Published on selection change or search input. Contains `columnProp`, `selectedValues` (if options are changed), `searchKeyword` (if search input is changed), and `source: 'DropdownFilter'`.                                           |
-| `EVENTS.FILTER_APPLIED`  | `{ columnProp: string, values: Array, source: string }`       | Published when the "Apply" button is clicked. Contains `columnProp`, the `values` that have been applied, and `source: 'DropdownFilter'`.                                                                                                 |
+| `EVENTS.FILTER_CHANGED`  | `{ columnProp: string, selectedValues: Array, source: string }` OR `{ columnProp: string, searchKeyword: string, source: string }` | Published on selection change or search input. Contains `columnProp`, `selectedValues` (if options are changed), `searchKeyword` (if search input is changed), and `source: 'ActiveFilters'`.                                           |
+| `EVENTS.FILTER_APPLIED`  | `{ columnProp: string, values: Array, source: string }`       | Published when the "Apply" button is clicked. Contains `columnProp`, the `values` that have been applied, and `source: 'ActiveFilters'`.                                                                                                 |
 | `EVENTS.DATA_LOADING`  | `{ columnProp: string, keyword: string }`                     | Published when a remote search is initiated and data loading begins. Contains `columnProp` and the `keyword` being searched.                                                                                                            |
 | `EVENTS.DATA_LOADED`   | `{ columnProp: string, keyword: string, optionsCount: number }` | Published when remote search data has been successfully loaded. Contains `columnProp`, the `keyword` used, and the `optionsCount` of results.                                                                                             |
 
