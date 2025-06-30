@@ -13,7 +13,7 @@ export interface LocaleObject {
   apply?: string
 }
 
-export default class ActiveFilters extends Vue {
+export default class DropdownFilter extends Vue {
   key: string
   label: string
   selectedFilters: Array<string | number>
