@@ -1,4 +1,4 @@
-import DropdownFilter from './src/DropdownFilter.vue'
+import DropdownFilter from './src/components/DropdownFilter.vue'
 
 DropdownFilter.install = function (Vue) {
   Vue.component(DropdownFilter.name, DropdownFilter)

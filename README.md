@@ -1,50 +1,103 @@
-# @terry0316/vue2-dropdown-filter
+# @TerryChen0316/vue2-dropdown-filter
 
-🔽 Test only. A reusable Vue 2 + Element-UI dropdown filter component with remote search, direct options, i18n, and eventBus (PubSub.js) support.
-
-## ✅ Features
-
-- ✅ `directOptions` mode or `remoteSearchFn` dynamic search
-- ✅ i18n locale support
-- ✅ PubSub.js for apply/cancel event broadcasting
-- ✅ "Select All", "Clear All", and "Apply/Cancel" actions
+Test only. A reusable Vue 2 + Element UI dropdown filter component for filtering table data.  
+It supports dynamic option lists, placeholder text, default values, and emits filter events for parent components to handle.
 
 ## 📦 Installation
 
 ```bash
-npm install @terry0316/vue2-dropdown-filter pubsub-js
+npm install @terry0316/vue2-dropdown-filter
+````
+
+## 🧩 Component Features
+
+* ✅ Vue 2 support
+* ✅ Element UI integration
+* ✅ Emits `filter-change` event on selection
+* ✅ Supports dynamic dropdown items
+* ✅ Can be used in Element UI table header slots
+
+## 🔧 Props
+
+| Prop          | Type      | Required | Description                                        |
+| ------------- | --------- | -------- | -------------------------------------------------- |
+| `label`       | `String`  | ❌        | The label for the dropdown (optional UI use only). |
+| `value`       | `String`  | ❌        | Currently selected value. Supports `v-model`.      |
+| `options`     | `Array`   | ✅        | Array of `{ label, value }` items for dropdown.    |
+| `placeholder` | `String`  | ❌        | Placeholder text. Default: `"Please select"`       |
+| `prop`        | `String`  | ✅        | The column key this filter is bound to.            |
+| `disabled`    | `Boolean` | ❌        | Whether the dropdown is disabled. Default: `false` |
+
+## 🔁 Events
+
+| Event Name      | Payload                        | Description                              |
+| --------------- | ------------------------------ | ---------------------------------------- |
+| `filter-change` | `{ prop: string, value: any }` | Emitted when dropdown value is selected. |
+
+## ✨ Usage Example
+
+```vue
+<template>
+  <el-table :data="filteredData" style="width: 100%">
+    <el-table-column label="Status" prop="status">
+      <template #header>
+        <DropdownFilter
+          prop="status"
+          :options="statusOptions"
+          v-model="filters.status"
+          placeholder="Select status"
+          @filter-change="handleFilterChange"
+        />
+      </template>
+    </el-table-column>
+  </el-table>
+</template>
+
+<script>
+import DropdownFilter from '@TerryChen0316/vue2-dropdown-filter'
+
+export default {
+  components: { DropdownFilter },
+  data() {
+    return {
+      filters: {
+        status: ''
+      },
+      statusOptions: [
+        { label: 'Active', value: 'active' },
+        { label: 'Inactive', value: 'inactive' }
+      ],
+      tableData: [
+        { id: 1, status: 'active' },
+        { id: 2, status: 'inactive' }
+      ]
+    }
+  },
+  computed: {
+    filteredData() {
+      const { status } = this.filters
+      return status
+        ? this.tableData.filter(row => row.status === status)
+        : this.tableData
+    }
+  },
+  methods: {
+    handleFilterChange({ prop, value }) {
+      console.log(`Filtering ${prop} by`, value)
+    }
+  }
+}
+</script>
 ```
 
-## 🛠 Usage
+## 🧪 Testing
 
-```js
-import Vue from 'vue'
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
-import DropdownFilter from '@terry0316/vue2-dropdown-filter'
-
-Vue.use(ElementUI)
-Vue.component('DropdownFilter', DropdownFilter)
-```
-
-## 💡 Props
-
-| Prop            | Type     | Required | Description                        |
-|-----------------|----------|----------|------------------------------------|
-| `key`           | String   | ✔        | Unique identifier for PubSub       |
-| `label`         | String   | ✔        | Display label                      |
-| `selectedFilters` | Array | ✔        | Selected filters (v-model style)   |
-| `remoteSearchFn` | Function | ✘      | Async search function              |
-| `directOptions` | Array    | ✔        | If non-empty, disables remoteSearch|
-| `locale`        | Object   | ✘        | i18n support                       |
-
-## 🔬 Test
+To run unit tests:
 
 ```bash
-npm install
 npm run test
 ```
 
 ## 📜 License
 
-MIT
+MIT © 2025 Terry Chen

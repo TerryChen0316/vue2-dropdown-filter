@@ -138,8 +138,8 @@
 
 <script>
 import debounce from 'lodash.debounce'
-import { EventBus, EVENTS } from './utils/eventBus.js'
-import { I18n, DEFAULT_LOCALE } from './utils/i18n.js'
+import { EventBus, EVENTS } from '../utils/eventBus.js'
+import { I18n, DEFAULT_LOCALE } from '../utils/i18n.js'
 
 export default {
   name: 'DropdownFilter',
