@@ -1,55 +1,74 @@
-# @terry0316/vue2-dropdown-filter
+# DropdownFilter.vue Component
 
-`Test only`. A customizable Vue 2 dropdown filter component designed for data tables or similar interfaces, supporting both direct options and remote search capabilities. It includes internationalization (i18n) and uses an event bus for inter-component communication.
+## Overview
+
+`DropdownFilter.vue` is a reusable Vue component that provides a flexible and powerful dropdown filter for data tables. It is designed to be attached to a table column header, offering users the ability to select multiple values to filter the data.
+
+The component supports two primary modes of operation:
+
+1.  **Direct Options Mode**: Populating the filter with a predefined list of options.
+2.  **Remote Search Mode**: Dynamically fetching filter options from a server based on user input, which is ideal for columns with a large number of potential filter values.
+
+It is built using `element-ui` and features robust state management through an event bus, allowing it to seamlessly integrate with other components, such as a centralized "active filters" display. It also includes built-in support for internationalization (i18n).
 
 ## Features
 
-* **Dropdown Filter**: A reusable Vue 2 component for filtering data.
-* **Filter Count Badge**: Displays the number of active filters.
-* **Search Functionality**: Supports searching through options, with debouncing for remote searches.
-* **Direct Options**: Can be populated with a predefined list of options.
-* **Remote Search**: Integrates with a `remoteSearchFn` prop for fetching options asynchronously based on search input.
-* **Select All/Clear All**: Convenient buttons to manage selections.
-* **Internationalization (i18n)**: Built-in support for multiple languages with customizable messages.
-* **Event-Driven Communication**: Utilizes a PubSub-based event bus for seamless integration with other components (e.g., `ActiveFilters`).
+  - **Two Data Modes**: Works with either a static list of options (`directOptions`) or a dynamic `remoteSearchFn`.
+  - **Multi-Select**: Users can select multiple filter values using checkboxes.
+  - **Search Functionality**: An input field to search for options when in remote mode.
+  - **State Management**:
+      - Communicates with other components via an `EventBus` to keep filter states synchronized.
+      - Remembers applied filters and indicates an active filter state.
+  - **Filter Count Badge**: Optionally displays a badge with the number of applied filters for a given column.
+  - **User-Friendly Controls**: Includes "Select All", "Clear", "Apply", and "Cancel" buttons for easy interaction.
+  - **Internationalization (i18n)**: All UI text can be translated using the `locale` and `customMessages` props.
+  - **Debounced Search**: Optimizes performance by debouncing search requests in remote mode.
+  - **Loading State**: Provides visual feedback to the user while fetching remote data.
+
+## Dependencies
+
+  - **Vue.js**: The core framework.
+  - **Element UI**: Used for UI components like dropdowns, buttons, checkboxes, and inputs.
+  - **lodash.debounce**: Used to debounce user input for remote searches.
+  - **EventBus**: A custom event bus utility (`utils/eventBus.js`) for cross-component communication.
+  - **I18n**: A custom internationalization utility (`utils/i18n.js`) for managing translations.
 
 ## Installation
 
-```bash
-npm install @terry0316/vue2-dropdown-filter
-# OR
-yarn add @terry0316/vue2-dropdown-filter
-````
+1.  **Prerequisites**: Ensure your project has Vue.js, Element UI, and `lodash.debounce` installed.
+    ```bash
+    npm install element-ui lodash.debounce
+    ```
+2.  **Add Component**: Copy the `DropdownFilter.vue` file into your project's components directory.
+3.  **Utilities**: Make sure the required utility files, `eventBus.js` and `i18n.js`, are present in your project's `utils` directory and are correctly referenced.
+4.  **Import**: Import the component into the parent Vue file where you intend to use it.
+    ```javascript
+    import DropdownFilter from './components/DropdownFilter.vue';
+    ```
 
 ## Usage
 
-### Registering the Component
+Here are two examples demonstrating how to use the component in both direct options mode and remote search mode.
 
-```vue
-// main.js or a component where you want to use it
-import Vue from 'vue'
-import DropdownFilter from '@terry0316/vue2-dropdown-filter'
+### Example 1: Direct Options
 
-Vue.component('DropdownFilter', DropdownFilter)
-```
-
-### Basic Usage
-
-You can use the component with direct options:
+Use the `directOptions` prop when you have a small, predefined set of filter options.
 
 ```vue
 <template>
-  <dropdown-filter
-    column-prop="status"
-    column-label="Status"
-    :direct-options="['Active', 'Inactive', 'Pending']"
-    :selected-filters="selectedStatus"
-    @filter-change="handleFilterChange"
-  />
+  <div>
+    <DropdownFilter
+      columnProp="status"
+      columnLabel="Status"
+      :selectedFilters="activeStatusFilters"
+      :directOptions="['Active', 'Inactive', 'Pending', 'Archived']"
+      @filter-change="onFilterChange"
+    />
+  </div>
 </template>
 
 <script>
-import DropdownFilter from '@terry0316/vue2-dropdown-filter';
+import DropdownFilter from './components/DropdownFilter.vue';
 
 export default {
   components: {
@@ -57,37 +76,41 @@ export default {
   },
   data() {
     return {
-      selectedStatus: []
+      activeStatusFilters: ['Active'] // Pre-selected filters
     };
   },
   methods: {
-    handleFilterChange({ columnProp, values }) {
-      console.log(`Filter for ${columnProp} changed to:`, values);
-      this.selectedStatus = values;
-      // Trigger your data filtering logic here
+    onFilterChange(payload) {
+      // { columnProp: 'status', values: [...] }
+      console.log('Filters updated:', payload);
+      this.activeStatusFilters = payload.values;
+      // Add logic to refetch table data with new filters
     }
   }
 };
 </script>
 ```
 
-### Usage with Remote Search
+### Example 2: Remote Search
 
-For scenarios where options need to be fetched from an API:
+Use the `remoteSearchFn` prop to fetch options from an API. The component will only show a search bar and will call this function with the user's search term.
 
 ```vue
 <template>
-  <dropdown-filter
-    column-prop="userName"
-    column-label="User Name"
-    :remote-search-fn="searchUsers"
-    :selected-filters="selectedUsers"
-    @filter-change="handleFilterChange"
-  />
+  <div>
+    <DropdownFilter
+      columnProp="user"
+      columnLabel="User"
+      :selectedFilters="activeUserFilters"
+      :remoteSearchFn="searchUsers"
+      @filter-change="onFilterChange"
+    />
+  </div>
 </template>
 
 <script>
-import DropdownFilter from '@terry0316/vue2-dropdown-filter';
+import DropdownFilter from './components/DropdownFilter.vue';
+import { fetchUsersAPI } from './api'; // Your API fetching logic
 
 export default {
   components: {
@@ -95,160 +118,141 @@ export default {
   },
   data() {
     return {
-      selectedUsers: []
+      activeUserFilters: []
     };
   },
   methods: {
     async searchUsers(keyword) {
-      // Simulate API call
-      return new Promise(resolve => {
-        setTimeout(() => {
-          const allUsers = ['Alice', 'Bob', 'Charlie', 'David', 'Eve'];
-          const filteredUsers = allUsers.filter(user =>
-            user.toLowerCase().includes(keyword.toLowerCase())
-          );
-          resolve(filteredUsers);
-        }, 500);
-      });
+      // This function must return a Promise that resolves to an array of strings.
+      if (!keyword) return [];
+      try {
+        const users = await fetchUsersAPI({ name: keyword });
+        return users.map(user => user.name); // e.g., ['John Doe', 'Jane Smith']
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+        return [];
+      }
     },
-    handleFilterChange({ columnProp, values }) {
-      console.log(`Filter for ${columnProp} changed to:`, values);
-      this.selectedUsers = values;
-      // Trigger your data filtering logic here
+    onFilterChange(payload) {
+      // { columnProp: 'user', values: [...] }
+      console.log('Filters updated:', payload);
+      this.activeUserFilters = payload.values;
+      // Add logic to refetch table data with new filters
     }
   }
 };
 </script>
 ```
 
-### Internationalization (i18n)
+-----
 
-The component uses a simple i18n utility. You can specify the `locale` and provide `customMessages`.
+## API
+
+### Props
+
+| Prop              | Type     | Required | Default        | Description                                                                                                                              |
+| ----------------- | -------- | -------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `columnProp`      | `String` | `true`   | `undefined`    | A unique identifier for the column (e.g., 'userName', 'status').                                                                         |
+| `columnLabel`     | `String` | `true`   | `undefined`    | The display name of the column, used in messages and logs (e.g., 'User Name').                                                           |
+| `selectedFilters` | `Array`  | `false`  | `[]`           | An array of initially selected filter values.                                                                                            |
+| `directOptions`   | `Array`  | `false`  | `[]`           | A predefined array of string options for the filter dropdown. If provided, remote search is disabled.                                    |
+| `remoteSearchFn`  | `Function`| `false` | `null`         | A function that accepts a `keyword` and returns a `Promise` which resolves to an array of string options. Used when `directOptions` is empty. |
+| `showFilterCount` | `Boolean`| `false`  | `true`         | If `true`, displays a badge showing the count of applied filters.                                                                        |
+| `locale`          | `String` | `false`  | `en`           | The locale for i18n. See the "Internationalization" section for details.                                                                 |
+| `customMessages`  | `Object` | `false`  | `{}`           | An object containing custom translations. See the "Internationalization" section for details.                                            |
+
+### Events
+
+#### Emitted Events (`$emit`)
+
+The component emits one primary event to its parent for backward compatibility. However, the recommended way to manage state is via the `EventBus`.
+
+| Event           | Payload                                        | Description                                                      |
+| --------------- | ---------------------------------------------- | ---------------------------------------------------------------- |
+| `filter-change` | `{ columnProp: String, values: Array<String> }` | Fired when the "Apply" button is clicked. Contains the final selected values. |
+
+#### EventBus Integration
+
+The component heavily relies on an `EventBus` to communicate with other parts of the application, such as an `ActiveFilters` component that might display all currently applied filters.
+
+**Published Events**
+
+| Event               | Payload                                                               | Description                                                          |
+| ------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `DROPDOWN_OPENED`   | `{ columnProp, columnLabel }`                                         | Published when the filter dropdown is opened.                        |
+| `DROPDOWN_CLOSED`   | `{ columnProp, columnLabel }`                                         | Published when the filter dropdown is closed.                        |
+| `FILTER_CHANGED`    | `{ columnProp, selectedValues?, searchKeyword?, source }`             | Published in real-time as the user selects/deselects options or types in the search box. |
+| `FILTER_APPLIED`    | `{ columnProp, values, source }`                                      | Published when the user clicks the "Apply" button.                   |
+| `DATA_LOADING`      | `{ columnProp, keyword }`                                             | Published just before a `remoteSearchFn` call is made.               |
+| `DATA_LOADED`       | `{ columnProp, keyword, optionsCount }`                               | Published after the `remoteSearchFn` call successfully completes.    |
+
+**Subscribed Events**
+
+| Event             | Payload                             | Description                                                                                                    |
+| ----------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `FILTER_REMOVED`  | `{ columnProp, value, source }`     | Listens for this event to remove a specific filter value from its state (e.g., when a user clears it from an external `ActiveFilters` component). |
+| `FILTERS_CLEARED` | `{ source }`                        | Listens for this event to clear all its selected filters (e.g., when a "Clear All" button is clicked elsewhere). |
+
+-----
+
+## Internationalization (i18n)
+
+The component has built-in text that can be translated. You can provide your own translations using the `locale` and `customMessages` props.
+
+**Default English Keys (`en`)**:
+
+```json
+{
+  "search": "Search",
+  "optionsCount": "{count} options",
+  "selectAll": "Select All",
+  "clear": "Clear",
+  "noOptions": "No options",
+  "cancel": "Cancel",
+  "apply": "Apply",
+  "loadingError": "Failed to load {label} options"
+}
+```
+
+### Example: Providing Spanish Translations
 
 ```vue
 <template>
-  <dropdown-filter
-    column-prop="category"
-    column-label="Category"
-    :direct-options="['Electronics', 'Books', 'Clothing']"
-    locale="zh-TW"
-    :custom-messages="customFilterMessages"
+  <DropdownFilter
+    columnProp="category"
+    columnLabel="Categoría"
+    :remoteSearchFn="searchCategories"
+    locale="es"
+    :customMessages="esMessages"
+    @filter-change="onFilterChange"
   />
 </template>
 
 <script>
-import DropdownFilter from '@terry0316/vue2-dropdown-filter';
-
 export default {
-  components: {
-    DropdownFilter
-  },
   data() {
     return {
-      customFilterMessages: {
-        apply: '套用篩選',
-        // Override other keys if needed
+      esMessages: {
+        es: {
+          search: "Buscar",
+          optionsCount: "{count} opciones",
+          selectAll: "Seleccionar todo",
+          clear: "Limpiar",
+          noOptions: "No hay opciones",
+          cancel: "Cancelar",
+          apply: "Aplicar",
+          loadingError: "Error al cargar opciones de {label}"
+        }
       }
     };
-  }
-};
+  },
+  // ... other methods
+}
 </script>
 ```
 
-**Supported Locales (Built-in):**
-
-  * `en` (English)
-  * `zh-TW` (Traditional Chinese)
-  * `zh-CN` (Simplified Chinese)
-  * `ja` (Japanese)
-
-## Props
-
-| Name              | Type     | Default       | Description                                                                                                                                                                             |
-| :---------------- | :------- | :------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `columnProp`      | `String` | `required`    | A unique identifier for the filter column (e.g., `'status'`, `'userId'`). Used for event bus communication and component identification.                                                 |
-| `columnLabel`     | `String` | `required`    | The display label for the filter column, used in error messages or for clarity.                                                                                                         |
-| `selectedFilters` | `Array`  | `[]`          | An array of currently selected filter values for this column. This prop is used to initialize and reflect the selected state.                                                           |
-| `directOptions`   | `Array`  | `[]`          | An array of strings representing the options to be displayed in the dropdown. If provided, `remoteSearchFn` will be ignored.                                                             |
-| `remoteSearchFn`  | `Function` | `null`        | A function that takes a `keyword` (string) as an argument and returns a `Promise` that resolves to an array of option strings. Used for fetching options dynamically.                |
-| `showFilterCount` | `Boolean` | `true`        | Whether to display the small badge showing the number of selected filters.                                                                                                              |
-| `locale`          | `String` | `'en'`        | The locale string for internationalization (e.g., `'en'`, `'zh-TW'`).                                                                                                                   |
-| `customMessages`  | `Object` | `{}`          | An object containing custom messages to override or extend the built-in i18n messages for the specified `locale`.                                                                       |
-
-## Events
-
-The component emits a `filter-change` event to its parent for backward compatibility, but primarily communicates changes via a global `EventBus`.
-
-### Component Emitted Events (via `$emit`)
-
-| Event Name      | Payload                                  | Description                                                                                                                                             |
-| :-------------- | :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `filter-change` | `{ columnProp: string, values: Array }` | Emitted when the "Apply" button is clicked, providing the `columnProp` and the new `selectedValues` for the filter. This is for parent component reactivity. |
-
-### Event Bus Communications (using `EventBus`)
-
-The component publishes and subscribes to various events on the `EventBus` (from `eventBus.js`) to facilitate communication with other parts of your application, such as an `ActiveFilters` component.
-
-#### Published Events
-
-| Event Name          | Payload                                                               | Description                                                                                                                                                                                                                                           |
-| :------------------ | :-------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `EVENTS.DROPDOWN_OPENED` | `{ columnProp: string, columnLabel: string }`                 | Published when the filter dropdown is opened.                                                                                                                                                                                                   |
-| `EVENTS.DROPDOWN_CLOSED` | `{ columnProp: string, columnLabel: string }`                 | Published when the filter dropdown is closed.                                                                                                                                                                                                   |
-| `EVENTS.FILTER_CHANGED`  | `{ columnProp: string, selectedValues: Array, source: string }` OR `{ columnProp: string, searchKeyword: string, source: string }` | Published on selection change or search input. Contains `columnProp`, `selectedValues` (if options are changed), `searchKeyword` (if search input is changed), and `source: 'DropdownFilter'`.                                           |
-| `EVENTS.FILTER_APPLIED`  | `{ columnProp: string, values: Array, source: string }`       | Published when the "Apply" button is clicked. Contains `columnProp`, the `values` that have been applied, and `source: 'DropdownFilter'`.                                                                                                 |
-| `EVENTS.DATA_LOADING`  | `{ columnProp: string, keyword: string }`                     | Published when a remote search is initiated and data loading begins. Contains `columnProp` and the `keyword` being searched.                                                                                                            |
-| `EVENTS.DATA_LOADED`   | `{ columnProp: string, keyword: string, optionsCount: number }` | Published when remote search data has been successfully loaded. Contains `columnProp`, the `keyword` used, and the `optionsCount` of results.                                                                                             |
-
-#### Subscribed Events
-
-| Event Name           | Description                                                                                                                                  |
-| :------------------- | :------------------------------------------------------------------------------------------------------------------------------------------- |
-| `EVENTS.FILTER_REMOVED` | Listens for filter removal events from other components (e.g., an `ActiveFilters` component) to update its internal state when a specific filter value is removed for its `columnProp`. |
-| `EVENTS.FILTERS_CLEARED` | Listens for a global clear all filters event from other components to reset its internal selected values and search keyword. |
-
 ## Styling
 
-The component uses scoped CSS, but also relies on Element UI's styles. Make sure you have Element UI properly configured in your project.
+The component's styles are scoped using the `<style scoped>` tag to prevent them from leaking into other parts of your application. It relies on the global styles of **Element UI**, so ensure Element UI's CSS is properly imported in your project.
 
-You can override the default styles by targeting the component's classes:
-
-```css
-.filter-dropdown-wrapper {
-  /* Your overrides */
-}
-
-.filter-count-badge {
-  /* Your overrides */
-}
-
-/* etc. */
-```
-
-## Development
-
-The component is built with Vue 2 and uses `lodash.debounce` for search functionality and `pubsub-js` for the event bus.
-
-### `i18n.js`
-
-This utility provides basic internationalization:
-
-  * `DEFAULT_LOCALE`: 'en'
-  * `LOCALES`: An object containing message translations for 'en', 'zh-TW', 'zh-CN', and 'ja'.
-  * `I18n` class: Manages the current locale and message translation.
-      * `constructor(locale, customMessages)`: Initializes with a locale and optional custom messages.
-      * `t(key, params)`: Translates a given key, with optional parameter replacement.
-      * `setLocale(locale, customMessages)`: Changes the current locale and updates messages.
-      * `addMessages(messages)`: Adds or overrides messages for the current locale.
-
-### `eventBus.js`
-
-This file defines an `EventBus` using `pubsub-js` for decoupled component communication.
-
-  * `EVENTS`: An object listing all defined event types (e.g., `FILTER_CHANGED`, `DROPDOWN_OPENED`).
-  * `EventBus` object: Provides `publish`, `subscribe`, `unsubscribe`, `unsubscribeAll`, and `clearAll` methods.
-      * Includes `console.log` statements for debugging event flow.
-
-## Contributing
-
-Feel free to open issues or submit pull requests.
+Customization can be done by overriding the scoped CSS classes within the component file or by using deep selectors from a parent component if necessary.
