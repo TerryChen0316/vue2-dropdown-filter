@@ -79,6 +79,41 @@ npm install @terry0316/vue2-dropdown-filter
     Vue.use(ElementUI)
     ```
 
+## Development
+
+This component includes a full development environment for testing and demonstration.
+
+### Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/TerryChen0316/vue2-dropdown-filter.git
+cd vue2-dropdown-filter
+
+# Install dependencies
+npm install
+
+# Start development server (includes demo)
+npm run dev
+
+# Run tests
+npm test
+
+# Build for production
+npm run build
+```
+
+### Demo Application
+
+The project includes a comprehensive demo at `http://localhost:3000` when running `npm run dev`. The demo showcases:
+
+- **Direct Options Mode**: Pre-defined category filters
+- **Remote Search Mode**: Dynamic user search with API simulation
+- **Internationalization**: Multi-language support (English, Chinese, Spanish)
+- **Styling Customization**: Background color picker
+- **State Management**: Real-time filter synchronization
+- **Event Handling**: Complete event flow demonstration
+
 ## Testing
 
 This component comes with a comprehensive test suite using Jest and Vue Test Utils. The tests cover:
@@ -128,17 +163,17 @@ Use the `directOptions` prop when you have a small, predefined set of filter opt
 <template>
   <div>
     <DropdownFilter
-      columnProp="status"
-      columnLabel="Status"
-      :selectedFilters="activeStatusFilters"
-      :directOptions="['Active', 'Inactive', 'Pending', 'Archived']"
+      column-prop="status"
+      column-label="Status"
+      :selected-filters="activeStatusFilters"
+      :direct-options="['Active', 'Inactive', 'Pending', 'Archived']"
       @filter-change="onFilterChange"
     />
   </div>
 </template>
 
 <script>
-import DropdownFilter from './components/DropdownFilter.vue';
+import DropdownFilter from '@terry0316/vue2-dropdown-filter'
 
 export default {
   components: {
@@ -150,10 +185,10 @@ export default {
     };
   },
   methods: {
-    onFilterChange(payload) {
+    onFilterChange(data) {
       // { columnProp: 'status', values: [...] }
-      console.log('Filters updated:', payload);
-      this.activeStatusFilters = payload.values;
+      console.log('Filters updated:', data);
+      this.activeStatusFilters = data.values;
       // Add logic to refetch table data with new filters
     }
   }
@@ -169,18 +204,18 @@ Use the `remoteSearchFn` prop to fetch options from an API. The component will o
 <template>
   <div>
     <DropdownFilter
-      columnProp="user"
-      columnLabel="User"
-      :selectedFilters="activeUserFilters"
-      :remoteSearchFn="searchUsers"
+      column-prop="user"
+      column-label="User"
+      :selected-filters="activeUserFilters"
+      :remote-search-fn="searchUsers"
       @filter-change="onFilterChange"
     />
   </div>
 </template>
 
 <script>
-import DropdownFilter from './components/DropdownFilter.vue';
-import { fetchUsersAPI } from './api'; // Your API fetching logic
+import DropdownFilter from '@terry0316/vue2-dropdown-filter'
+import { fetchUsersAPI } from './api' // Your API fetching logic
 
 export default {
   components: {
@@ -203,15 +238,251 @@ export default {
         return [];
       }
     },
-    onFilterChange(payload) {
+    onFilterChange(data) {
       // { columnProp: 'user', values: [...] }
-      console.log('Filters updated:', payload);
-      this.activeUserFilters = payload.values;
+      console.log('Filters updated:', data);
+      this.activeUserFilters = data.values;
       // Add logic to refetch table data with new filters
     }
   }
 };
 </script>
+```
+
+### Example 3: Complete Integration with All Features
+
+Here's a comprehensive example showing all component features working together:
+
+```vue
+<template>
+  <div class="filter-demo">
+    <!-- Global Controls -->
+    <div class="controls">
+      <el-select v-model="currentLocale" @change="updateLocale" size="small">
+        <el-option value="en-US" label="English"></el-option>
+        <el-option value="zh-CN" label="中文"></el-option>
+        <el-option value="es-ES" label="Español"></el-option>
+      </el-select>
+      
+      <el-color-picker v-model="backgroundColor" size="small"></el-color-picker>
+      
+      <el-button @click="clearAllFilters" type="danger" size="small">
+        Clear All
+      </el-button>
+    </div>
+
+    <!-- Filter Components -->
+    <div class="filter-components">
+      <!-- Status Filter (Direct Options) -->
+      <DropdownFilter
+        column-prop="status"
+        column-label="Status"
+        :selected-filters="filters.status"
+        :direct-options="statusOptions"
+        :background-color="backgroundColor"
+        :locale="currentLocale"
+        :custom-messages="customMessages"
+        @filter-change="onFilterChange"
+      />
+
+      <!-- User Filter (Remote Search) -->
+      <DropdownFilter
+        column-prop="user"
+        column-label="User"
+        :selected-filters="filters.user"
+        :remote-search-fn="searchUsers"
+        :background-color="backgroundColor"
+        :locale="currentLocale"
+        :custom-messages="customMessages"
+        @filter-change="onFilterChange"
+      />
+
+      <!-- Category Filter (Pre-selected) -->
+      <DropdownFilter
+        column-prop="category"
+        column-label="Category"
+        :selected-filters="filters.category"
+        :direct-options="categoryOptions"
+        :background-color="backgroundColor"
+        :locale="currentLocale"
+        :custom-messages="customMessages"
+        @filter-change="onFilterChange"
+      />
+    </div>
+
+    <!-- Active Filters Display -->
+    <div class="active-filters">
+      <h4>Active Filters:</h4>
+      <div v-for="(values, prop) in activeFilters" :key="prop">
+        <strong>{{ getFilterLabel(prop) }}:</strong>
+        <el-tag 
+          v-for="value in values" 
+          :key="value" 
+          closable 
+          @close="removeFilter(prop, value)"
+          style="margin: 0 5px;"
+        >
+          {{ value }}
+        </el-tag>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import DropdownFilter from '@terry0316/vue2-dropdown-filter'
+
+export default {
+  components: {
+    DropdownFilter
+  },
+  data() {
+    return {
+      currentLocale: 'en-US',
+      backgroundColor: '#ffffff',
+      
+      // Filter options
+      statusOptions: ['Active', 'Inactive', 'Pending', 'Archived'],
+      categoryOptions: ['Electronics', 'Clothing', 'Books', 'Home'],
+      
+      // Current filter values
+      filters: {
+        status: ['Active'],      // Pre-selected
+        user: [],
+        category: ['Electronics'] // Pre-selected
+      },
+      
+      // Multi-language support
+      customMessages: {
+        'en-US': {
+          search: "Search users...",
+          selectAll: "Select All",
+          clear: "Clear",
+          apply: "Apply Filters",
+          cancel: "Cancel",
+          noOptions: "No users found",
+          optionsCount: "{count} users available",
+          loadingError: "Failed to load {label}"
+        },
+        'zh-CN': {
+          search: "搜索用户...",
+          selectAll: "全选",
+          clear: "清空",
+          apply: "应用筛选",
+          cancel: "取消",
+          noOptions: "未找到用户",
+          optionsCount: "找到 {count} 位用户",
+          loadingError: "加载 {label} 失败"
+        },
+        'es-ES': {
+          search: "Buscar usuarios...",
+          selectAll: "Seleccionar todo",
+          clear: "Limpiar",
+          apply: "Aplicar filtros",
+          cancel: "Cancelar",
+          noOptions: "No se encontraron usuarios",
+          optionsCount: "{count} usuarios disponibles",
+          loadingError: "Error al cargar {label}"
+        }
+      }
+    }
+  },
+  computed: {
+    activeFilters() {
+      const active = {}
+      Object.keys(this.filters).forEach(key => {
+        if (this.filters[key].length > 0) {
+          active[key] = this.filters[key]
+        }
+      })
+      return active
+    }
+  },
+  methods: {
+    onFilterChange(data) {
+      console.log('Filter change:', data)
+      this.$set(this.filters, data.columnProp, data.values)
+      
+      // Trigger data refetch
+      this.refreshTableData()
+    },
+    
+    async searchUsers(keyword) {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 300))
+      
+      const users = [
+        'John Doe', 'Jane Smith', 'Bob Johnson', 'Alice Brown',
+        'Charlie Wilson', 'David Lee', 'Emma Davis', 'Frank Miller'
+      ]
+      
+      return users.filter(user => 
+        user.toLowerCase().includes(keyword.toLowerCase())
+      )
+    },
+    
+    updateLocale(locale) {
+      this.currentLocale = locale
+    },
+    
+    clearAllFilters() {
+      this.filters = {
+        status: [],
+        user: [],
+        category: []
+      }
+      this.refreshTableData()
+    },
+    
+    removeFilter(columnProp, value) {
+      const index = this.filters[columnProp].indexOf(value)
+      if (index > -1) {
+        this.filters[columnProp].splice(index, 1)
+        this.refreshTableData()
+      }
+    },
+    
+    getFilterLabel(prop) {
+      const labels = {
+        status: 'Status',
+        user: 'User',
+        category: 'Category'
+      }
+      return labels[prop] || prop
+    },
+    
+    refreshTableData() {
+      // Your table data refresh logic here
+      console.log('Refreshing table with filters:', this.activeFilters)
+    }
+  }
+}
+</script>
+
+<style scoped>
+.filter-demo {
+  padding: 20px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.filter-components {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.active-filters {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 4px;
+}
+</style>
 ```
 
 -----
@@ -222,15 +493,15 @@ export default {
 
 | Prop              | Type       | Required | Default        | Description                                                                                                                              |
 | ----------------- | ---------- | -------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `columnProp`      | `String`   | `true`   | `undefined`    | A unique identifier for the column (e.g., 'userName', 'status'). Used for event identification and internal state management.           |
-| `columnLabel`     | `String`   | `true`   | `undefined`    | The display name of the column, used in messages, logs, and error displays (e.g., 'User Name', 'Status').                              |
-| `selectedFilters` | `Array`    | `false`  | `[]`           | An array of initially selected filter values. These values will be pre-selected when the component mounts.                               |
-| `directOptions`   | `Array`    | `false`  | `[]`           | A predefined array of string options for the filter dropdown. When provided, the component operates in "Direct Options Mode" and remote search is disabled. |
-| `remoteSearchFn`  | `Function` | `false`  | `null`         | A function that accepts a `keyword` parameter and returns a `Promise` resolving to an array of string options. Used for "Remote Search Mode" when `directOptions` is empty. |
-| `showFilterCount` | `Boolean`  | `false`  | `true`         | Controls whether to display a badge showing the count of applied filters. The badge appears as a small blue circle with the filter count. |
-| `backgroundColor` | `String`   | `false`  | `'#ffffff'`    | Customizes the background color of the dropdown menu and filter content area. Accepts any valid CSS color value.                        |
+| `column-prop`     | `String`   | `true`   | `undefined`    | A unique identifier for the column (e.g., 'userName', 'status'). Used for event identification and internal state management. Uses kebab-case for HTML attributes. |
+| `column-label`    | `String`   | `true`   | `undefined`    | The display name of the column, used in messages, logs, and error displays (e.g., 'User Name', 'Status').                              |
+| `selected-filters`| `Array`    | `false`  | `[]`           | An array of initially selected filter values. These values will be pre-selected when the component mounts.                               |
+| `direct-options`  | `Array`    | `false`  | `[]`           | A predefined array of string options for the filter dropdown. When provided, the component operates in "Direct Options Mode" and remote search is disabled. |
+| `remote-search-fn`| `Function` | `false`  | `null`         | A function that accepts a `keyword` parameter and returns a `Promise` resolving to an array of string options. Used for "Remote Search Mode" when `directOptions` is empty. |
+| `show-filter-count`| `Boolean` | `false`  | `true`         | Controls whether to display a badge showing the count of applied filters. The badge appears as a small blue circle with the filter count. |
+| `background-color`| `String`   | `false`  | `'#ffffff'`    | Customizes the background color of the dropdown menu and filter content area. Accepts any valid CSS color value.                        |
 | `locale`          | `String`   | `false`  | `'en-US'`      | The locale for internationalization. Determines the default language for UI text. Supported values include 'en-US', 'zh-CN', etc.      |
-| `customMessages`  | `Object`   | `false`  | `{}`           | An object containing custom translations organized by locale. Structure: `{ 'locale': { 'key': 'translation' } }`. See the "Internationalization" section for complete details and examples. |
+| `custom-messages` | `Object`   | `false`  | `{}`           | An object containing custom translations organized by locale. Structure: `{ 'locale': { 'key': 'translation' } }`. See the "Internationalization" section for complete details and examples. |
 
 ### Events
 
@@ -240,7 +511,7 @@ The component emits one primary event to its parent for backward compatibility. 
 
 | Event           | Payload                                        | Description                                                      |
 | --------------- | ---------------------------------------------- | ---------------------------------------------------------------- |
-| `filter-change` | `{ columnProp: String, values: Array<String> }` | Fired when the "Apply" button is clicked. Contains the final selected values. |
+| `filter-change` | `{ columnProp: String, values: Array<String> }` | Fired when the "Apply" button is clicked. Contains the final selected values. **Note**: The event handler receives the data object directly, not as separate parameters. |
 
 #### EventBus Integration
 
@@ -313,11 +584,11 @@ The `customMessages` prop accepts an object structured by locale, where each loc
 ```vue
 <template>
   <DropdownFilter
-    columnProp="status"
-    columnLabel="Status"
+    column-prop="status"
+    column-label="Status"
     locale="en-US"
-    :customMessages="customTranslations"
-    :directOptions="['Active', 'Inactive']"
+    :custom-messages="customTranslations"
+    :direct-options="['Active', 'Inactive']"
   />
 </template>
 
@@ -343,11 +614,11 @@ export default {
 ```vue
 <template>
   <DropdownFilter
-    columnProp="category"
-    columnLabel="Categoría"
+    column-prop="category"
+    column-label="Categoría"
     :locale="currentLocale"
-    :customMessages="multiLangMessages"
-    :remoteSearchFn="searchCategories"
+    :custom-messages="multiLangMessages"
+    :remote-search-fn="searchCategories"
     @filter-change="onFilterChange"
   />
 </template>
@@ -398,7 +669,6 @@ export default {
     // ... other methods
   }
 }
-}
 </script>
 ```
 
@@ -408,6 +678,8 @@ export default {
 2. **Placeholder Support**: Some messages support placeholders like `{count}` and `{label}` for dynamic content
 3. **Reactive Updates**: Changes to `customMessages` prop will immediately update the UI text
 4. **Fallback Behavior**: If a translation key is missing, the component falls back to built-in defaults
+
+-----
 
 ## Styling
 
@@ -429,10 +701,10 @@ Use the `backgroundColor` prop to customize the dropdown appearance:
 ```vue
 <template>
   <DropdownFilter
-    columnProp="theme"
-    columnLabel="Theme"
-    :directOptions="['Light', 'Dark']"
-    backgroundColor="#f8f9fa"
+    column-prop="theme"
+    column-label="Theme"
+    :direct-options="['Light', 'Dark']"
+    background-color="#f8f9fa"
   />
 </template>
 ```
@@ -497,13 +769,16 @@ The component includes basic accessibility features:
 ### Common Issues
 
 **Issue**: Dropdown doesn't show options
-- **Solution**: Ensure `directOptions` has values OR `remoteSearchFn` is provided and working
+- **Solution**: Ensure `direct-options` has values OR `remote-search-fn` is provided and working
 
 **Issue**: Remote search not triggering
-- **Solution**: Verify `directOptions` is empty and `remoteSearchFn` returns a Promise
+- **Solution**: Verify `direct-options` is empty and `remote-search-fn` returns a Promise
 
 **Issue**: Translations not appearing
-- **Solution**: Check that locale matches the key in `customMessages` and restart the component
+- **Solution**: Check that locale matches the key in `custom-messages` and restart the component
+
+**Issue**: Import error with lodash.debounce
+- **Solution**: The component now handles CommonJS/ES module compatibility automatically
 
 **Issue**: Styling conflicts
 - **Solution**: Ensure Element UI CSS is loaded and use scoped CSS or deep selectors for customization
@@ -514,7 +789,7 @@ Enable console logging to debug EventBus communication:
 
 ```javascript
 // In your component or main app
-import { EventBus } from './utils/eventBus.js'
+import { EventBus } from '@terry0316/vue2-dropdown-filter/src/utils/eventBus.js'
 
 // Log all events (development only)
 EventBus.subscribe('*', (event, data) => {
@@ -527,9 +802,10 @@ EventBus.subscribe('*', (event, data) => {
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
 3. Run tests: `npm test`
-4. Commit changes: `git commit -m 'Add amazing feature'`
-5. Push to branch: `git push origin feature/amazing-feature`
-6. Open a Pull Request
+4. Start development server: `npm run dev`
+5. Commit changes: `git commit -m 'Add amazing feature'`
+6. Push to branch: `git push origin feature/amazing-feature`
+7. Open a Pull Request
 
 ### Development Setup
 
@@ -544,8 +820,31 @@ npm install
 # Run tests
 npm test
 
+# Start development server with demo
+npm run dev
+
 # Run tests with coverage
 npm test -- --coverage
+```
+
+### Project Structure
+
+```
+vue2-dropdown-filter/
+├── src/
+│   ├── components/
+│   │   └── DropdownFilter.vue    # Main component
+│   └── utils/
+│       ├── eventBus.js           # EventBus implementation
+│       └── i18n.js              # Internationalization utilities
+├── demo/                        # Development demo application
+│   ├── App.vue                  # Demo showcase
+│   └── main.js                  # Demo entry point
+├── __tests__/
+│   └── DropdownFilter.spec.js   # Comprehensive test suite
+├── types/
+│   └── index.d.ts              # TypeScript definitions
+└── package.json                # Project configuration
 ```
 
 ## License
