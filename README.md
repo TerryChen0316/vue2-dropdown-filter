@@ -27,24 +27,94 @@ It is built using `element-ui` and features robust state management through an e
 
 ## Dependencies
 
-  - **Vue.js**: The core framework.
-  - **Element UI**: Used for UI components like dropdowns, buttons, checkboxes, and inputs.
-  - **lodash.debounce**: Used to debounce user input for remote searches.
-  - **EventBus**: A custom event bus utility (`utils/eventBus.js`) for cross-component communication.
-  - **I18n**: A custom internationalization utility (`utils/i18n.js`) for managing translations.
+  - **Vue.js**: The core framework (^2.7.16).
+  - **Element UI**: Used for UI components like dropdowns, buttons, checkboxes, and inputs (^2.15.14).
+  - **lodash.debounce**: Used to debounce user input for remote searches (^4.0.8).
+  - **pubsub-js**: Used for the EventBus communication pattern (^1.9.4).
+
+### Development Dependencies
+
+The component includes a full development setup with:
+- **Jest**: Testing framework
+- **Vue Test Utils**: Vue-specific testing utilities
+- **Babel**: JavaScript compilation
+- **ESLint**: Code linting (optional)
 
 ## Installation
 
-1.  **Prerequisites**: Ensure your project has Vue.js, Element UI, and `lodash.debounce` installed.
+### Using npm
+
+```bash
+npm install @terry0316/vue2-dropdown-filter
+```
+
+### Manual Installation
+
+1.  **Prerequisites**: Ensure your project has the required dependencies installed:
     ```bash
-    npm install element-ui lodash.debounce
+    npm install element-ui lodash.debounce pubsub-js vue@^2.7.16
     ```
-2.  **Add Component**: Copy the `DropdownFilter.vue` file into your project's components directory.
-3.  **Utilities**: Make sure the required utility files, `eventBus.js` and `i18n.js`, are present in your project's `utils` directory and are correctly referenced.
-4.  **Import**: Import the component into the parent Vue file where you intend to use it.
+
+2.  **Add Component**: Import and register the component in your Vue application:
     ```javascript
-    import DropdownFilter from './components/DropdownFilter.vue';
+    import DropdownFilter from '@terry0316/vue2-dropdown-filter'
+    
+    // Global registration
+    Vue.component('DropdownFilter', DropdownFilter)
+    
+    // Or local registration in a component
+    export default {
+      components: {
+        DropdownFilter
+      }
+      // ...
+    }
     ```
+
+3.  **Element UI Setup**: Ensure Element UI is properly configured in your project:
+    ```javascript
+    import ElementUI from 'element-ui'
+    import 'element-ui/lib/theme-chalk/index.css'
+    
+    Vue.use(ElementUI)
+    ```
+
+## Testing
+
+This component comes with a comprehensive test suite using Jest and Vue Test Utils. The tests cover:
+
+- Component creation and prop validation
+- Computed properties and reactive behavior
+- Filter operations (select all, clear, apply, cancel)
+- Direct options and remote search modes
+- Event emission and EventBus communication
+- Error handling and edge cases
+- Internationalization functionality
+
+### Running Tests
+
+```bash
+# Run tests
+npm test
+
+# Run tests with coverage
+npm test -- --coverage
+
+# Run tests in watch mode
+npm test -- --watch
+```
+
+### Test Coverage
+
+The test suite includes 20+ test cases covering:
+- ✅ Component lifecycle and creation
+- ✅ Props validation and default values
+- ✅ Computed property calculations
+- ✅ User interactions and event handling
+- ✅ Remote search functionality with success/error scenarios
+- ✅ Direct options handling
+- ✅ Reactive data updates via watchers
+- ✅ CSS class conditional rendering
 
 ## Usage
 
@@ -150,16 +220,17 @@ export default {
 
 ### Props
 
-| Prop              | Type     | Required | Default        | Description                                                                                                                              |
-| ----------------- | -------- | -------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `columnProp`      | `String` | `true`   | `undefined`    | A unique identifier for the column (e.g., 'userName', 'status').                                                                         |
-| `columnLabel`     | `String` | `true`   | `undefined`    | The display name of the column, used in messages and logs (e.g., 'User Name').                                                           |
-| `selectedFilters` | `Array`  | `false`  | `[]`           | An array of initially selected filter values.                                                                                            |
-| `directOptions`   | `Array`  | `false`  | `[]`           | A predefined array of string options for the filter dropdown. If provided, remote search is disabled.                                    |
-| `remoteSearchFn`  | `Function`| `false` | `null`         | A function that accepts a `keyword` and returns a `Promise` which resolves to an array of string options. Used when `directOptions` is empty. |
-| `showFilterCount` | `Boolean`| `false`  | `true`         | If `true`, displays a badge showing the count of applied filters.                                                                        |
-| `locale`          | `String` | `false`  | `en`           | The locale for i18n. See the "Internationalization" section for details.                                                                 |
-| `customMessages`  | `Object` | `false`  | `{}`           | An object containing custom translations. See the "Internationalization" section for details.                                            |
+| Prop              | Type       | Required | Default        | Description                                                                                                                              |
+| ----------------- | ---------- | -------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `columnProp`      | `String`   | `true`   | `undefined`    | A unique identifier for the column (e.g., 'userName', 'status'). Used for event identification and internal state management.           |
+| `columnLabel`     | `String`   | `true`   | `undefined`    | The display name of the column, used in messages, logs, and error displays (e.g., 'User Name', 'Status').                              |
+| `selectedFilters` | `Array`    | `false`  | `[]`           | An array of initially selected filter values. These values will be pre-selected when the component mounts.                               |
+| `directOptions`   | `Array`    | `false`  | `[]`           | A predefined array of string options for the filter dropdown. When provided, the component operates in "Direct Options Mode" and remote search is disabled. |
+| `remoteSearchFn`  | `Function` | `false`  | `null`         | A function that accepts a `keyword` parameter and returns a `Promise` resolving to an array of string options. Used for "Remote Search Mode" when `directOptions` is empty. |
+| `showFilterCount` | `Boolean`  | `false`  | `true`         | Controls whether to display a badge showing the count of applied filters. The badge appears as a small blue circle with the filter count. |
+| `backgroundColor` | `String`   | `false`  | `'#ffffff'`    | Customizes the background color of the dropdown menu and filter content area. Accepts any valid CSS color value.                        |
+| `locale`          | `String`   | `false`  | `'en-US'`      | The locale for internationalization. Determines the default language for UI text. Supported values include 'en-US', 'zh-CN', etc.      |
+| `customMessages`  | `Object`   | `false`  | `{}`           | An object containing custom translations organized by locale. Structure: `{ 'locale': { 'key': 'translation' } }`. See the "Internationalization" section for complete details and examples. |
 
 ### Events
 
@@ -197,9 +268,19 @@ The component heavily relies on an `EventBus` to communicate with other parts of
 
 ## Internationalization (i18n)
 
-The component has built-in text that can be translated. You can provide your own translations using the `locale` and `customMessages` props.
+The component provides comprehensive internationalization support through the `locale` and `customMessages` props. All user-facing text can be customized and translated to match your application's language requirements.
 
-**Default English Keys (`en`)**:
+### Supported Locales
+
+The component comes with built-in support for:
+- **English (en-US)** - Default locale
+- **Chinese Simplified (zh-CN)** - Built-in translations
+
+You can extend support to any locale by providing custom translations via the `customMessages` prop.
+
+### Default Translation Keys
+
+**English (en-US) - Default Keys:**
 
 ```json
 {
@@ -214,16 +295,59 @@ The component has built-in text that can be translated. You can provide your own
 }
 ```
 
-### Example: Providing Spanish Translations
+### Using the `customMessages` Prop
+
+The `customMessages` prop accepts an object structured by locale, where each locale contains key-value pairs for translations:
+
+```javascript
+{
+  'locale-code': {
+    'translation-key': 'translated-text',
+    // ... more translations
+  }
+}
+```
+
+#### Simple Example: Single Locale Override
+
+```vue
+<template>
+  <DropdownFilter
+    columnProp="status"
+    columnLabel="Status"
+    locale="en-US"
+    :customMessages="customTranslations"
+    :directOptions="['Active', 'Inactive']"
+  />
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      customTranslations: {
+        'en-US': {
+          search: "Search for items...",
+          selectAll: "Choose All",
+          apply: "Filter Now"
+        }
+      }
+    }
+  }
+}
+</script>
+```
+
+#### Advanced Example: Multiple Locales
 
 ```vue
 <template>
   <DropdownFilter
     columnProp="category"
     columnLabel="Categoría"
+    :locale="currentLocale"
+    :customMessages="multiLangMessages"
     :remoteSearchFn="searchCategories"
-    locale="es"
-    :customMessages="esMessages"
     @filter-change="onFilterChange"
   />
 </template>
@@ -232,27 +356,204 @@ The component has built-in text that can be translated. You can provide your own
 export default {
   data() {
     return {
-      esMessages: {
-        es: {
+      currentLocale: 'es-ES',
+      multiLangMessages: {
+        'es-ES': {
           search: "Buscar",
-          optionsCount: "{count} opciones",
+          optionsCount: "{count} opciones disponibles",
           selectAll: "Seleccionar todo",
-          clear: "Limpiar",
-          noOptions: "No hay opciones",
+          clear: "Limpiar selección",
+          noOptions: "No hay opciones disponibles",
           cancel: "Cancelar",
-          apply: "Aplicar",
+          apply: "Aplicar filtros",
           loadingError: "Error al cargar opciones de {label}"
+        },
+        'fr-FR': {
+          search: "Rechercher",
+          optionsCount: "{count} options",
+          selectAll: "Tout sélectionner",
+          clear: "Effacer",
+          noOptions: "Aucune option",
+          cancel: "Annuler",
+          apply: "Appliquer",
+          loadingError: "Échec du chargement des options {label}"
+        },
+        'de-DE': {
+          search: "Suchen",
+          optionsCount: "{count} Optionen",
+          selectAll: "Alle auswählen",
+          clear: "Leeren",
+          noOptions: "Keine Optionen",
+          cancel: "Abbrechen",
+          apply: "Anwenden",
+          loadingError: "Fehler beim Laden der {label} Optionen"
         }
       }
     };
   },
-  // ... other methods
+  methods: {
+    switchLanguage(locale) {
+      this.currentLocale = locale;
+    }
+    // ... other methods
+  }
+}
 }
 </script>
 ```
 
+### Key Features of `customMessages`
+
+1. **Partial Overrides**: You don't need to provide all translation keys - only override the ones you want to customize
+2. **Placeholder Support**: Some messages support placeholders like `{count}` and `{label}` for dynamic content
+3. **Reactive Updates**: Changes to `customMessages` prop will immediately update the UI text
+4. **Fallback Behavior**: If a translation key is missing, the component falls back to built-in defaults
+
 ## Styling
 
-The component's styles are scoped using the `<style scoped>` tag to prevent them from leaking into other parts of your application. It relies on the global styles of **Element UI**, so ensure Element UI's CSS is properly imported in your project.
+The component provides flexible styling options while maintaining Element UI compatibility.
 
-Customization can be done by overriding the scoped CSS classes within the component file or by using deep selectors from a parent component if necessary.
+### Built-in Styling
+
+The component uses scoped CSS to prevent style conflicts and includes:
+- Responsive dropdown layout
+- Filter count badge styling
+- Loading state indicators
+- Hover and active state animations
+- Modern color scheme with customizable backgrounds
+
+### Background Color Customization
+
+Use the `backgroundColor` prop to customize the dropdown appearance:
+
+```vue
+<template>
+  <DropdownFilter
+    columnProp="theme"
+    columnLabel="Theme"
+    :directOptions="['Light', 'Dark']"
+    backgroundColor="#f8f9fa"
+  />
+</template>
+```
+
+### Advanced Styling
+
+For deeper customization, you can override CSS classes using deep selectors:
+
+```vue
+<style>
+/* Customize the filter trigger button */
+.filter-dropdown-wrapper .filter-trigger:hover {
+  color: #your-brand-color !important;
+}
+
+/* Customize the dropdown menu */
+.filter-dropdown-wrapper ::v-deep .el-dropdown-menu {
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Customize the filter count badge */
+.filter-dropdown-wrapper .filter-count-badge {
+  background-color: #your-brand-color;
+}
+</style>
+```
+
+### Available CSS Classes
+
+- `.filter-dropdown-wrapper` - Main container
+- `.filter-count-badge` - Filter count indicator
+- `.filter-trigger` - Dropdown trigger button
+- `.filter-content` - Dropdown content area
+- `.filter-search` - Search input container
+- `.filter-options` - Options list container
+- `.filter-controls` - Apply/Cancel button area
+
+## Best Practices
+
+### Performance Optimization
+
+1. **Debounced Search**: The component automatically debounces remote search requests (300ms delay)
+2. **Efficient Re-renders**: Use stable references for `directOptions` and `remoteSearchFn` props
+3. **Memory Management**: The component automatically cleans up event listeners on destroy
+
+### State Management
+
+1. **EventBus Integration**: Leverage the EventBus for centralized filter state management
+2. **Controlled Components**: Always sync local state with the `selectedFilters` prop
+3. **Error Handling**: Implement proper error handling in your `remoteSearchFn`
+
+### Accessibility
+
+The component includes basic accessibility features:
+- Keyboard navigation support through Element UI components
+- ARIA labels for screen readers
+- Focus management for dropdown interactions
+
+## Troubleshooting
+
+### Common Issues
+
+**Issue**: Dropdown doesn't show options
+- **Solution**: Ensure `directOptions` has values OR `remoteSearchFn` is provided and working
+
+**Issue**: Remote search not triggering
+- **Solution**: Verify `directOptions` is empty and `remoteSearchFn` returns a Promise
+
+**Issue**: Translations not appearing
+- **Solution**: Check that locale matches the key in `customMessages` and restart the component
+
+**Issue**: Styling conflicts
+- **Solution**: Ensure Element UI CSS is loaded and use scoped CSS or deep selectors for customization
+
+### Debug Mode
+
+Enable console logging to debug EventBus communication:
+
+```javascript
+// In your component or main app
+import { EventBus } from './utils/eventBus.js'
+
+// Log all events (development only)
+EventBus.subscribe('*', (event, data) => {
+  console.log('EventBus:', event, data)
+})
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Run tests: `npm test`
+4. Commit changes: `git commit -m 'Add amazing feature'`
+5. Push to branch: `git push origin feature/amazing-feature`
+6. Open a Pull Request
+
+### Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/TerryChen0316/vue2-dropdown-filter.git
+cd vue2-dropdown-filter
+
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+
+# Run tests with coverage
+npm test -- --coverage
+```
+
+## License
+
+MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+- **GitHub Issues**: [Report bugs or request features](https://github.com/TerryChen0316/vue2-dropdown-filter/issues)
+- **Documentation**: This README provides comprehensive usage examples
+- **Tests**: Run `npm test` to see component behavior examples

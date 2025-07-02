@@ -21,8 +21,15 @@
       <span class="filter-trigger">
         <i class="el-icon-arrow-down"></i>
       </span>
-      <el-dropdown-menu slot="dropdown" class="filter-dropdown-menu">
-        <div class="filter-content">
+      <el-dropdown-menu 
+        slot="dropdown" 
+        class="filter-dropdown-menu"
+        :style="{ backgroundColor: backgroundColor }"
+      >
+        <div 
+          class="filter-content"
+          :style="{ backgroundColor: backgroundColor }"
+        >
           <!-- Search Input - Only show when directOptions is empty -->
           <div 
             v-if="shouldShowSearch" 
@@ -39,7 +46,10 @@
           </div>
           
           <!-- Filter Options Header -->
-          <div class="filter-options-header">
+          <div 
+            v-if="shouldShowFilterOptions"
+            class="filter-options-header"
+          >
             <span class="options-count">
               {{ i18n.t('optionsCount', { count: filterOptions.length }) }}
             </span>
@@ -55,6 +65,7 @@
           
           <!-- Options List -->
           <div 
+            v-if="shouldShowFilterOptions"
             class="filter-options" 
             v-loading="loading"
           >
@@ -80,7 +91,10 @@
           </div>
           
           <!-- Filter Control Buttons -->
-          <div class="filter-controls">
+          <div 
+            class="filter-controls"
+            :class="{ 'no-border': !shouldShowFilterOptions }"
+          >
             <el-button 
               size="mini" 
               @click="handleCancel"
@@ -133,6 +147,11 @@ export default {
       type: Boolean,
       default: true
     },
+    // Background color customization
+    backgroundColor: {
+      type: String,
+      default: '#ffffff'
+    },
     // i18n props
     locale: {
       type: String,
@@ -174,6 +193,13 @@ export default {
     shouldUseRemoteSearch() {
       // Only use remote search when directOptions is empty and searchKeyword has content
       return this.directOptions.length === 0 && this.searchKeyword.length > 0
+    },
+    
+    shouldShowFilterOptions() {
+      // Show filter options when:
+      // 1. Not using search (directOptions available), OR
+      // 2. Using search and has search keyword
+      return !this.shouldShowSearch || this.searchKeyword.length > 0
     }
   },
   
@@ -468,10 +494,14 @@ export default {
 
 .filter-dropdown-menu {
   min-width: 220px;
+  /* Default background-color moved to inline style with fallback */
+  background-color: #ffffff;
 }
 
 .filter-content {
   padding: 12px;
+  /* Default background-color moved to inline style with fallback */
+  background-color: #ffffff;
 }
 
 .filter-search {
@@ -526,6 +556,10 @@ export default {
   gap: 8px;
   padding-top: 8px;
   border-top: 1px solid #e4e7ed;
+}
+
+.filter-controls.no-border {
+  border-top: none;
 }
 
 .filter-controls .el-button {

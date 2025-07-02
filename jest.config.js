@@ -1,9 +1,13 @@
 module.exports = {
-  preset: '@vue/cli-plugin-unit-jest',
-  moduleFileExtensions: ['js', 'json', 'vue'],
+  testEnvironment: 'jsdom',
+  moduleFileExtensions: ['js', 'json'],
   transform: {
-    '^.+\.vue$': 'vue-jest',
     '^.+\.js$': 'babel-jest'
   },
-  testMatch: ['**/__tests__/**/*.spec.[jt]s?(x)']
+  testMatch: ['**/__tests__/**/*.spec.[jt]s?(x)'],
+  collectCoverageFrom: [
+    'src/**/*.{js}',
+    '!**/node_modules/**'
+  ],
+  setupFiles: ['<rootDir>/jest.setup.js']
 }
