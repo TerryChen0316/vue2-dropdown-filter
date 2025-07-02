@@ -116,7 +116,7 @@
 </template>
 
 <script>
-import debounce from 'lodash.debounce'
+import debounce from 'lodash-es/debounce'
 import { EventBus, EVENTS } from '../utils/eventBus.js'
 import { I18n, DEFAULT_LOCALE } from '../utils/i18n.js'
 
