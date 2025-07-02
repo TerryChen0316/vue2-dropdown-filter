@@ -29,7 +29,7 @@ It is built using `element-ui` and features robust state management through an e
 
   - **Vue.js**: The core framework (^2.7.16).
   - **Element UI**: Used for UI components like dropdowns, buttons, checkboxes, and inputs (^2.15.14).
-  - **lodash.debounce**: Used to debounce user input for remote searches (^4.0.8).
+  - **lodash-es**: Used for utility functions like debounce for user input optimization (^4.17.21).
   - **pubsub-js**: Used for the EventBus communication pattern (^1.9.4).
 
 ### Development Dependencies
@@ -52,7 +52,7 @@ npm install @terry0316/vue2-dropdown-filter
 
 1.  **Prerequisites**: Ensure your project has the required dependencies installed:
     ```bash
-    npm install element-ui lodash.debounce pubsub-js vue@^2.7.16
+    npm install element-ui lodash-es pubsub-js vue@^2.7.16
     ```
 
 2.  **Add Component**: Import and register the component in your Vue application:
@@ -777,8 +777,8 @@ The component includes basic accessibility features:
 **Issue**: Translations not appearing
 - **Solution**: Check that locale matches the key in `custom-messages` and restart the component
 
-**Issue**: Import error with lodash.debounce
-- **Solution**: The component now handles CommonJS/ES module compatibility automatically
+**Issue**: Import error with lodash-es
+- **Solution**: The component now uses `lodash-es` for proper ES module compatibility. Ensure you have `lodash-es` installed instead of `lodash.debounce`.
 
 **Issue**: Styling conflicts
 - **Solution**: Ensure Element UI CSS is loaded and use scoped CSS or deep selectors for customization

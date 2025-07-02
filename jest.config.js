@@ -1,12 +1,13 @@
 module.exports = {
   testEnvironment: 'jsdom',
-  moduleFileExtensions: ['js', 'json'],
+  moduleFileExtensions: ['js', 'json', 'vue'],
   transform: {
-    '^.+\.js$': 'babel-jest'
+    '^.+\.js$': 'babel-jest',
+    '.*\.vue$': 'vue-jest'
   },
   testMatch: ['**/__tests__/**/*.spec.[jt]s?(x)'],
   collectCoverageFrom: [
-    'src/**/*.{js}',
+    'src/**/*.{js,vue}',
     '!**/node_modules/**'
   ],
   setupFiles: ['<rootDir>/jest.setup.js']
