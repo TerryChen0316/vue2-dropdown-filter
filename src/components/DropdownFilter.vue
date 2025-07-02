@@ -116,11 +116,9 @@
 </template>
 
 <script>
-import debounceLib from 'lodash.debounce'
+import debounce from 'lodash.debounce'
 import { EventBus, EVENTS } from '../utils/eventBus.js'
 import { I18n, DEFAULT_LOCALE } from '../utils/i18n.js'
-
-const debounce = debounceLib.default || debounceLib
 
 export default {
   name: 'DropdownFilter',
