@@ -21,15 +21,8 @@
       <span class="filter-trigger">
         <i class="el-icon-arrow-down"></i>
       </span>
-      <el-dropdown-menu 
-        slot="dropdown" 
-        class="filter-dropdown-menu"
-        :style="{ backgroundColor: backgroundColor }"
-      >
-        <div 
-          class="filter-content"
-          :style="{ backgroundColor: backgroundColor }"
-        >
+      <el-dropdown-menu slot="dropdown" class="filter-dropdown-menu">
+        <div class="filter-content">
           <!-- Search Input - Only show when directOptions is empty -->
           <div 
             v-if="shouldShowSearch" 
@@ -146,11 +139,6 @@ export default {
     showFilterCount: {
       type: Boolean,
       default: true
-    },
-    // Background color customization
-    backgroundColor: {
-      type: String,
-      default: '#ffffff'
     },
     // i18n props
     locale: {
@@ -494,13 +482,11 @@ export default {
 
 .filter-dropdown-menu {
   min-width: 220px;
-  /* Default background-color moved to inline style with fallback */
   background-color: #ffffff;
 }
 
 .filter-content {
   padding: 12px;
-  /* Default background-color moved to inline style with fallback */
   background-color: #ffffff;
 }
 

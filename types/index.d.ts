@@ -73,8 +73,6 @@ export interface DropdownFilterProps {
   remoteSearchFn?: (keyword: string) => Promise<string[]>
   /** Whether to show the filter count badge */
   showFilterCount?: boolean
-  /** Background color for the dropdown menu */
-  backgroundColor?: string
   /** Locale for internationalization */
   locale?: string
   /** Custom translation messages */
@@ -114,8 +112,6 @@ export default class DropdownFilter extends Vue {
   remoteSearchFn?: (keyword: string) => Promise<string[]>
   /** Whether to show the filter count badge */
   showFilterCount: boolean
-  /** Background color for the dropdown menu */
-  backgroundColor: string
   /** Current locale for internationalization */
   locale: string
   /** Custom translation messages */
@@ -132,6 +128,12 @@ export default class DropdownFilter extends Vue {
   searchKeyword: string
   /** Loading state for remote search */
   loading: boolean
+  /** Debounced search function */
+  debouncedSearch: Function | null
+  /** EventBus subscription tokens */
+  subscriptionTokens: any[]
+  /** Internationalization instance */
+  i18n: any
 
   // Computed properties
   /** Whether any filters are currently applied */

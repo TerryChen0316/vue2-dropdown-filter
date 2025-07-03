@@ -151,10 +151,6 @@ const createMockDropdownFilter = () => ({
       type: Boolean,
       default: true
     },
-    backgroundColor: {
-      type: String,
-      default: '#ffffff'
-    },
     locale: {
       type: String,
       default: 'en-US'
@@ -171,7 +167,26 @@ const createMockDropdownFilter = () => ({
       filterOptions: [],
       searchKeyword: '',
       loading: false,
-      subscriptionTokens: []
+      subscriptionTokens: [],
+      i18n: {
+        t: (key, params = {}) => {
+          const messages = {
+            search: 'Search',
+            selectAll: 'Select All',
+            clear: 'Clear',
+            apply: 'Apply',
+            cancel: 'Cancel',
+            noOptions: 'No options',
+            optionsCount: '{count} options',
+            loadingError: 'Loading error'
+          }
+          let message = messages[key] || key
+          Object.keys(params).forEach(param => {
+            message = message.replace(`{${param}}`, params[param])
+          })
+          return message
+        }
+      }
     }
   },
   computed: {
@@ -184,6 +199,9 @@ const createMockDropdownFilter = () => ({
     shouldShowSearch() {
       return this.directOptions.length === 0
     },
+    shouldUseRemoteSearch() {
+      return this.directOptions.length === 0 && this.searchKeyword.length > 0
+    },
     shouldShowFilterOptions() {
       return !this.shouldShowSearch || this.searchKeyword.length > 0
     }
@@ -195,9 +213,11 @@ const createMockDropdownFilter = () => ({
   methods: {
     selectAllOptions() {
       this.selectedValues = [...this.filterOptions]
+      this.handleSelectionChange()
     },
     clearAllOptions() {
       this.selectedValues = []
+      this.handleSelectionChange()
     },
     handleCancel() {
       this.selectedValues = [...this.originalValues]
@@ -209,10 +229,41 @@ const createMockDropdownFilter = () => ({
         values: [...this.selectedValues]
       })
     },
+    handleSelectionChange() {
+      // Add newly selected options to filter options if not already present
+      this.selectedValues.forEach(value => {
+        if (!this.filterOptions.includes(value)) {
+          this.filterOptions.push(value)
+        }
+      })
+    },
+    handleVisibleChange(visible) {
+      if (visible) {
+        this.originalValues = [...this.selectedValues]
+        if (this.directOptions.length > 0) {
+          this.loadDirectOptions()
+        } else {
+          this.loadFilterOptions(this.searchKeyword)
+        }
+      }
+    },
+    handleSearchInput() {
+      if (this.shouldShowSearch) {
+        this.loadFilterOptions(this.searchKeyword)
+      }
+    },
     loadDirectOptions() {
       if (this.directOptions.length > 0) {
         this.filterOptions = [...this.directOptions]
+      } else {
+        this.filterOptions = []
       }
+      // Add currently selected values to options if not already present
+      this.selectedValues.forEach(value => {
+        if (!this.filterOptions.includes(value)) {
+          this.filterOptions.push(value)
+        }
+      })
     },
     async loadFilterOptions(keyword = '') {
       if (this.directOptions.length > 0 || !this.remoteSearchFn) {
@@ -226,10 +277,44 @@ const createMockDropdownFilter = () => ({
       try {
         const options = await this.remoteSearchFn(keyword)
         this.filterOptions = options
+        // Add currently selected values to options if not already present
+        this.selectedValues.forEach(value => {
+          if (!this.filterOptions.includes(value)) {
+            this.filterOptions.push(value)
+          }
+        })
       } catch (error) {
         console.error('Load options error:', error)
       } finally {
         this.loading = false
+      }
+    },
+    onFilterRemoved(data) {
+      if (data.columnProp === this.columnProp && data.source !== 'DropdownFilter') {
+        const index = this.selectedValues.indexOf(data.value)
+        if (index > -1) {
+          this.selectedValues.splice(index, 1)
+          this.originalValues = [...this.selectedValues]
+        }
+      }
+    },
+    onFiltersCleared(data) {
+      if (data.source !== 'DropdownFilter') {
+        this.selectedValues = []
+        this.originalValues = []
+        this.searchKeyword = ''
+      }
+    },
+    setupEventListeners() {
+      // Mock implementation for event listeners
+    },
+    cleanupEventListeners() {
+      // Mock implementation for cleanup
+    },
+    closeDropdown() {
+      const dropdown = this.$refs[`dropdown-${this.columnProp}`]
+      if (dropdown && dropdown.hide) {
+        dropdown.hide()
       }
     }
   },
@@ -281,7 +366,6 @@ describe('DropdownFilter', () => {
       })
       
       expect(wrapper.vm.showFilterCount).toBe(true)
-      expect(wrapper.vm.backgroundColor).toBe('#ffffff')
       expect(wrapper.vm.locale).toBe('en-US')
     })
   })
@@ -321,6 +405,20 @@ describe('DropdownFilter', () => {
       wrapper.setProps({ directOptions: ['option1'] })
       await wrapper.vm.$nextTick()
       expect(wrapper.vm.shouldShowSearch).toBe(false)
+    })
+
+    it('calculates shouldUseRemoteSearch correctly', async () => {
+      // With empty directOptions and empty searchKeyword
+      expect(wrapper.vm.shouldUseRemoteSearch).toBe(false)
+      
+      // With empty directOptions and searchKeyword
+      wrapper.vm.searchKeyword = 'test'
+      expect(wrapper.vm.shouldUseRemoteSearch).toBe(true)
+      
+      // With directOptions provided (should not use remote search)
+      wrapper.setProps({ directOptions: ['option1'] })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.vm.shouldUseRemoteSearch).toBe(false)
     })
 
     it('calculates shouldShowFilterOptions correctly', () => {
@@ -533,6 +631,100 @@ describe('DropdownFilter', () => {
       expect(wrapper.classes()).not.toContain('active')
       
       wrapper.destroy()
+    })
+  })
+
+  describe('Event Handling', () => {
+    let wrapper
+
+    beforeEach(() => {
+      const DropdownFilter = createMockDropdownFilter()
+      wrapper = shallowMount(DropdownFilter, {
+        localVue,
+        propsData: {
+          ...defaultProps,
+          selectedFilters: ['option1', 'option2']
+        }
+      })
+    })
+
+    afterEach(() => {
+      wrapper.destroy()
+    })
+
+    it('handles filter removal events correctly', () => {
+      wrapper.vm.selectedValues = ['option1', 'option2']
+      wrapper.vm.originalValues = ['option1', 'option2']
+      
+      // Simulate filter removal event
+      wrapper.vm.onFilterRemoved({
+        columnProp: 'test-column',
+        value: 'option1',
+        source: 'ActiveFilters'
+      })
+      
+      expect(wrapper.vm.selectedValues).toEqual(['option2'])
+      expect(wrapper.vm.originalValues).toEqual(['option2'])
+    })
+
+    it('ignores filter removal events from same component', () => {
+      wrapper.vm.selectedValues = ['option1', 'option2']
+      wrapper.vm.originalValues = ['option1', 'option2']
+      
+      // Simulate filter removal event from same component
+      wrapper.vm.onFilterRemoved({
+        columnProp: 'test-column',
+        value: 'option1',
+        source: 'DropdownFilter'
+      })
+      
+      expect(wrapper.vm.selectedValues).toEqual(['option1', 'option2'])
+      expect(wrapper.vm.originalValues).toEqual(['option1', 'option2'])
+    })
+
+    it('ignores filter removal events for different columns', () => {
+      wrapper.vm.selectedValues = ['option1', 'option2']
+      wrapper.vm.originalValues = ['option1', 'option2']
+      
+      // Simulate filter removal event for different column
+      wrapper.vm.onFilterRemoved({
+        columnProp: 'different-column',
+        value: 'option1',
+        source: 'ActiveFilters'
+      })
+      
+      expect(wrapper.vm.selectedValues).toEqual(['option1', 'option2'])
+      expect(wrapper.vm.originalValues).toEqual(['option1', 'option2'])
+    })
+
+    it('handles clear all filters events correctly', () => {
+      wrapper.vm.selectedValues = ['option1', 'option2']
+      wrapper.vm.originalValues = ['option1', 'option2']
+      wrapper.vm.searchKeyword = 'test'
+      
+      // Simulate clear all filters event
+      wrapper.vm.onFiltersCleared({
+        source: 'ActiveFilters'
+      })
+      
+      expect(wrapper.vm.selectedValues).toEqual([])
+      expect(wrapper.vm.originalValues).toEqual([])
+      expect(wrapper.vm.searchKeyword).toBe('')
+    })
+
+    it('ignores clear all filters events from same component', () => {
+      wrapper.vm.selectedValues = ['option1', 'option2']
+      wrapper.vm.originalValues = ['option1', 'option2']
+      wrapper.vm.searchKeyword = 'test'
+      
+      // Simulate clear all filters event from same component
+      wrapper.vm.onFiltersCleared({
+        source: 'DropdownFilter'
+      })
+      
+      expect(wrapper.vm.selectedValues).toEqual(['option1', 'option2'])
+      expect(wrapper.vm.originalValues).toEqual(['option1', 'option2'])
+      expect(wrapper.vm.searchKeyword).toBe('test')
     })
   })
 })
